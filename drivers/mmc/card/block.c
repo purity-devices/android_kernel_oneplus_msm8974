@@ -214,6 +214,8 @@ static ssize_t power_ro_lock_show(struct device *dev,
 
 	ret = snprintf(buf, PAGE_SIZE, "%d\n", locked);
 
+	mmc_blk_put(md);
+
 	return ret;
 }
 
@@ -2755,6 +2757,7 @@ out:
 	 *   (all existing requests completed or reinserted to the block layer)
 	 */
 	if ((!req && !(test_bit(MMC_QUEUE_NEW_REQUEST, &mq->flags))) ||
+			(cmd_flags & MMC_REQ_SPECIAL_MASK) ||
 			((test_bit(MMC_QUEUE_URGENT_REQUEST, &mq->flags)) &&
 			 !(cmd_flags & MMC_REQ_NOREINSERT_MASK))) {
 		if (mmc_card_need_bkops(card))
